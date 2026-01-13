@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: yookassa
+
+yookassa:
+  base-url: https://api.yookassa.ru
+  shop-id: ${SHOP_ID}
+  secret-key: ${SECRET_KEY}
+  type: redirect
+  return-url: https://yandex.ru/internet/
