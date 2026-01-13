@@ -1,6 +1,7 @@
 package yookassa.api.controllers;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<CreatePaymentResponseDto> getPaymentLink(
-            @RequestBody CreatePaymentRequestDto createPaymentRequest
+            @Valid @RequestBody CreatePaymentRequestDto createPaymentRequest
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(paymentService.createPayment(createPaymentRequest));
     }
