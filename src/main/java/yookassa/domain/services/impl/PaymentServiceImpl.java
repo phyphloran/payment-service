@@ -2,11 +2,16 @@ package yookassa.domain.services.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import yookassa.api.dtos.client.CreatePaymentResponseDto;
 import yookassa.api.dtos.yookassa.AmountDto;
 import yookassa.api.dtos.yookassa.requests.ConfirmationRequestDto;
+import yookassa.api.exceptionHandler.PaymentProcessingException;
 import yookassa.external.PaymentHttpClient;
 import yookassa.api.dtos.yookassa.responses.YooKassaCreatePaymentResponseDto;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
@@ -15,6 +20,7 @@ import yookassa.domain.services.PaymentService;
 import java.util.UUID;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -31,8 +37,20 @@ public class PaymentServiceImpl implements PaymentService {
     public CreatePaymentResponseDto createPayment(CreatePaymentRequestDto createPaymentRequest) {
         YooKassaCreatePaymentRequestDto requestToYooKassa = createRequestToYooKassa(createPaymentRequest);
         String idempotenceKey = UUID.randomUUID().toString();
-        YooKassaCreatePaymentResponseDto response = paymentHttpClient.createPayment(idempotenceKey, requestToYooKassa);
-        return new CreatePaymentResponseDto(response.confirmation().confirmationUrl());
+        try {
+            YooKassaCreatePaymentResponseDto response =
+                    paymentHttpClient.createPayment(idempotenceKey, requestToYooKassa);
+            return new CreatePaymentResponseDto(response.confirmation().confirmationUrl());
+        } catch (HttpClientErrorException e) {
+            log.error("YooKassa client error: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString(), e);
+            throw new PaymentProcessingException("Unexpected error, please try again later");
+        } catch (HttpServerErrorException e) {
+            log.error("YooKassa server error: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString(), e);
+            throw new PaymentProcessingException("Unexpected error, please try again later");
+        } catch (ResourceAccessException e) {
+            log.error("YooKassa connection error", e);
+            throw new PaymentProcessingException("Unexpected error, please try again later");
+        }
     }
 
     private YooKassaCreatePaymentRequestDto createRequestToYooKassa(CreatePaymentRequestDto createPaymentRequest) {

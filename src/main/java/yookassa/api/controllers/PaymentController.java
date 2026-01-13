@@ -25,7 +25,8 @@ public class PaymentController {
     public ResponseEntity<CreatePaymentResponseDto> getPaymentLink(
             @Valid @RequestBody CreatePaymentRequestDto createPaymentRequest
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(paymentService.createPayment(createPaymentRequest));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(paymentService.createPayment(createPaymentRequest));
     }
 
 }

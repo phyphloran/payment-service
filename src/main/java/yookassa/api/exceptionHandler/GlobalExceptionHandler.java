@@ -2,6 +2,7 @@ package yookassa.api.exceptionHandler;
 
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -15,10 +16,10 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-//    @ExceptionHandler(EntityNotFoundException.class)
-//    public ResponseEntity<ErrorDto> entityNotFoundException(EntityNotFoundException exception) {
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(List.of(exception.getMessage())));
-//    }
+    @ExceptionHandler(PaymentProcessingException.class)
+    public ResponseEntity<ErrorDto> paymentProcessingException(PaymentProcessingException exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDto(List.of(exception.getMessage())));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDto> handleValidationException(MethodArgumentNotValidException exception) {
