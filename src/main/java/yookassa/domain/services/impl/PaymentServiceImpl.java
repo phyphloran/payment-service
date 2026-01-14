@@ -10,6 +10,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import yookassa.api.dtos.client.CreatePaymentResponseDto;
 import yookassa.api.dtos.yookassa.AmountDto;
+import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
 import yookassa.api.dtos.yookassa.requests.ConfirmationRequestDto;
 import yookassa.api.exceptionHandler.PaymentProcessingException;
 import yookassa.external.PaymentHttpClient;
@@ -51,6 +52,11 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("YooKassa connection error", e);
             throw new PaymentProcessingException("Unexpected error, please try again later");
         }
+    }
+
+    @Override
+    public void changePaymentStatus(YookassaWebhookEventDto yookassaWebhookEventDto) {
+        //TODO
     }
 
     private YooKassaCreatePaymentRequestDto createRequestToYooKassa(CreatePaymentRequestDto createPaymentRequest) {
