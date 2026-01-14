@@ -1,16 +1,19 @@
 package yookassa.api.controllers;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
 import yookassa.api.dtos.client.CreatePaymentResponseDto;
 import yookassa.domain.services.PaymentService;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -29,14 +32,28 @@ public class PaymentController {
                 .body(paymentService.createPayment(createPaymentRequest));
     }
 
-    //TODO webhook
+    //test
     @PostMapping("/webhook")
-    public ResponseEntity<?> handleWebhook(
-            @RequestHeader("Authorization") String auth,
-            @RequestBody String temp
-    ) {
-        log.info("recived notification from yookassa: {}", temp);
-        return ResponseEntity.ok(Map.of("status", "ok"));
+    public ResponseEntity<?> handleWebhook(HttpServletRequest request) {
+        try {
+            String body = request.getReader().lines().collect(Collectors.joining());
+
+            log.info("ВЕБХУК ПОЛУЧЕН!");
+            log.info("Метод: {}", request.getMethod());
+            log.info("URL: {}", request.getRequestURL());
+            log.info("Query: {}", request.getQueryString());
+            log.info("Auth: {}", request.getHeader("Authorization"));
+            log.info("Content-Type: {}", request.getHeader("Content-Type"));
+            log.info("User-Agent: {}", request.getHeader("User-Agent"));
+            log.info("X-Forwarded-For: {}", request.getHeader("X-Forwarded-For"));
+            log.info("Тело ({} chars): {}", body.length(), body);
+
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+            log.error("ОШИБКА В ВЕБХУКЕ: ", e);
+            return ResponseEntity.status(500).build();
+        }
     }
 
 }
