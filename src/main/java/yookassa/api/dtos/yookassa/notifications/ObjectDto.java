@@ -1,5 +1,6 @@
 package yookassa.api.dtos.yookassa.notifications;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import yookassa.api.dtos.yookassa.AmountDto;
 
 public record ObjectDto(
@@ -22,6 +23,7 @@ public record ObjectDto(
 
         boolean test,
 
+        @JsonProperty("payment_method")
         PaymentMethodDto paymentMethod
 
 ) {
