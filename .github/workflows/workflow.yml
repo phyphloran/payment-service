@@ -26,9 +26,11 @@ jobs:
       - name: Run tests inside Docker
         run: |
           docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
             -e SHOP_ID="${{ secrets.SHOP_ID }}" \
             -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
-            yookassa:latest \
+            maven:3.9.9-amazoncorretto-21 \
             mvn test
 
   deploy:
