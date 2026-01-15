@@ -14,14 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Prepare Maven local repo
+        run: mkdir -p ${{ github.workspace }}/.m2
+
       - name: Run tests inside Docker
         run: |
           docker run --rm \
             -u $(id -u):$(id -g) \
             -v ${{ github.workspace }}:/app \
+            -v ${{ github.workspace }}/.m2:/app/.m2 \
             -w /app \
             -e SHOP_ID="${{ secrets.SHOP_ID }}" \
             -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            -e MAVEN_CONFIG=/app/.m2 \
             maven:3.9.9-amazoncorretto-21 \
             mvn clean test
 
