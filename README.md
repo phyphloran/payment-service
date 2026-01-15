@@ -2,19 +2,7 @@
 
 ---
 
-<h1>
-  <svg
-    width="32"
-    height="32"
-    viewBox="0 0 100 100"
-    xmlns="http://www.w3.org/2000/svg"
-    style="vertical-align: middle; margin-right: 8px;"
-  >
-    <circle cx="50" cy="50" r="45" fill="#7A3EFF"/>
-    <text x="50" y="58" text-anchor="middle" font-size="40" fill="white">Y</text>
-  </svg>
-  Payment Service
-</h1>
+# ![YooKassa](https://yookassa.ru/favicon.ico)
 
 ---
 
