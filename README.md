@@ -2,7 +2,15 @@
 
 ---
 
-# ![YooKassa](https://yookassa.ru/favicon.ico) Payment Service
+<h1>
+  <img
+    src="https://yookassa.ru/favicon.ico"
+    width="24"
+    style="vertical-align: middle;"
+  />
+  Payment Service
+</h1>
+
 
 ---
 
