@@ -2,8 +2,15 @@
 
 ## Architecture
 
-
-
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/phyphloran/payment-service/blob/main/architecture.png" alt="Architecture" width="600"/>
+      <br/>
+      Figure 1: Webhook flow from YooKassa → Nginx → Spring Boot
+    </td>
+  </tr>
+</table>
 
 ## Nginx Proxy Configuration
 
