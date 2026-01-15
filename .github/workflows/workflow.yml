@@ -7,7 +7,26 @@ on:
     branches: [ main ]
 
 jobs:
+
+  test:
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests inside Docker
+        run: |
+          docker run --rm \
+            -u $(id -u):$(id -g) \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            -e SHOP_ID="${{ secrets.SHOP_ID }}" \
+            -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            maven:3.9.9-amazoncorretto-21 \
+            mvn clean test
+
   build:
+    needs: test
     runs-on: self-hosted
     environment: production
     steps:
@@ -42,5 +61,4 @@ jobs:
         run: docker logs yookassa --tail 50
 
       - name: Remove unused Docker images
-        run: |
-          docker image prune -f
+        run: docker image prune -f
