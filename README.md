@@ -1,4 +1,9 @@
-# ![YooKassa](https://static.tildacdn.com/tild3965-3039-4464-b037-633164346132/image.png) Payment Service
+# ![YooKassa](https://static.tildacdn.com/tild3965-3039-4464-b037-633164346132/image.png) 
+
+---
+
+![YooKassa](https://yookassa.ru/favicon.ico) Payment Service
+
 ---
 
 ## Architecture
