@@ -5,17 +5,19 @@
 <table>
   <tr>
     <td valign="top">
-      **Webhook Flow**  
-      <br/>
-      1. Client (YooKassa) sends POST /webhook  
-      2. Nginx forwards request with real IP  
-      3. Spring Boot validates IP and processes webhook
+      <strong>Webhook Flow</strong>
+      <ol>
+        <li>Client (YooKassa) sends POST /webhook</li>
+        <li>Nginx forwards request with real IP</li>
+        <li>Spring Boot validates IP and processes webhook</li>
+      </ol>
     </td>
     <td>
       <img src="https://github.com/phyphloran/payment-service/blob/main/architecture.png" alt="Architecture" width="500"/>
     </td>
   </tr>
 </table>
+
 
 ## Nginx Proxy Configuration
 
