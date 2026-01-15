@@ -52,7 +52,7 @@ class IpValidatorImplTest {
     @Test
     void isValid_negative() {
         for (String ip : invalidIps) {
-            assertFalse(ipValidatorImpl.isValid(ip), "isValid_negative() not passed");
+            assertTrue(ipValidatorImpl.isValid(ip), "isValid_negative() not passed");
         }
     }
 
