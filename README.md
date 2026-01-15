@@ -46,3 +46,5 @@ proxy_set_header X-Real-IP $remote_addr;
 Thanks to this directive, Nginx forwards the real client IP to the backend.
 The backend accepts webhooks only from YooKassa, since all traffic goes through Nginx.
 Important: direct access to the backend from outside must be blocked to prevent bypassing the IP check.
+
+[![workflow](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml/badge.svg)](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml)
