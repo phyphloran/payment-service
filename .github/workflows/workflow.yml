@@ -28,6 +28,7 @@ jobs:
             mvn clean test -Dmaven.repo.local=/app/.m2/repository
   
   build:
+    needs: test
     runs-on: self-hosted
     environment: production
     steps:
