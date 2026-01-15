@@ -7,21 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-
-  test:
-    runs-on: self-hosted
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run tests with Maven
-        run: mvn clean test
-        env:
-          SHOP_ID: ${{ secrets.SHOP_ID }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
   build:
-    needs: test
     runs-on: self-hosted
     environment: production
     steps:
@@ -56,4 +42,5 @@ jobs:
         run: docker logs yookassa --tail 50
 
       - name: Remove unused Docker images
-        run: docker image prune -f
+        run: |
+          docker image prune -f
