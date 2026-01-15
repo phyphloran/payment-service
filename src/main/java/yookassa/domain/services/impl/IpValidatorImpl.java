@@ -1,24 +1,20 @@
 package yookassa.domain.services.impl;
 
 
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import yookassa.domain.services.IpValidator;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 
 @Service
 public class IpValidatorImpl implements IpValidator {
 
-    private final String[] ALLOWED_IPS = {
-            "185.71.76.0/27",
-            "185.71.77.0/27",
-            "77.75.153.0/25",
-            "77.75.156.11",
-            "77.75.156.35",
-            "77.75.154.128/25",
-            "2a02:5180::/32"
-    };
+    @Value("${yookassa.allowed-ips}")
+    private String[] ALLOWED_IPS;
 
     @Override
     public boolean isValid(String ip) {
@@ -66,6 +62,12 @@ public class IpValidatorImpl implements IpValidator {
                 .not();
 
         return ipVal.and(mask).equals(netVal.and(mask));
+    }
+
+    @PostConstruct
+    public void init() {
+        Arrays.stream(ALLOWED_IPS).forEach(s -> System.out.println(s));
+        System.out.println("\n" + ALLOWED_IPS[3]);
     }
 
 }
