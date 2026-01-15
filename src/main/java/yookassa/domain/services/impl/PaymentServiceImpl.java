@@ -1,7 +1,6 @@
 package yookassa.domain.services.impl;
 
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,26 +58,13 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    //TODO
     @Override
-    public void processPayment(
-            YookassaWebhookEventDto yookassaWebhookEventDto,
-            HttpServletRequest httpServletRequest
-    ) {
-        String ip = httpServletRequest.getRemoteAddr();
-        log.info("recived new yookassaWebhookEvent: {}, from ip: {}", yookassaWebhookEventDto.toString(), ip);
-
-        log.info("=== HEADERS ===");
-        httpServletRequest.getHeaderNames().asIterator()
-                .forEachRemaining(name ->
-                        log.info("{}: {}", name, httpServletRequest.getHeader(name))
-                );
-        log.info("=== END HEADERS ===");
-
+    public void processPayment(String ip, YookassaWebhookEventDto yookassaWebhookEventDto) {
         if (!ipValidator.isValid(ip)) {
             log.error("An attempt to send a webhook not from an Yookassa IP address: {}", ip);
             throw new IncorrectIpException("Incorrect ip");
         }
+        log.info("recived new yookassaWebhookEvent: {}, from ip: {}", yookassaWebhookEventDto.toString(), ip);
     }
 
     private YooKassaCreatePaymentRequestDto createRequestToYooKassa(CreatePaymentRequestDto createPaymentRequest) {
@@ -86,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(createAmountDto(createPaymentRequest))
                 .description(createPaymentRequest.description())
                 .capture(true)
-                .confirmation(createConfirmationDto(createPaymentRequest))
+                .confirmation(createConfirmationDto())
                 .build();
     }
 
@@ -97,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
-    private ConfirmationRequestDto createConfirmationDto(CreatePaymentRequestDto createPaymentRequest) {
+    private ConfirmationRequestDto createConfirmationDto() {
         return ConfirmationRequestDto.builder()
                 .type(type)
                 .return_url(returnUrl)
