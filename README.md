@@ -1,7 +1,5 @@
 # ![YooKassa](https://static.tildacdn.com/tild3965-3039-4464-b037-633164346132/image.png) 
 
----
-
 <h1>
   <img
     src="https://yookassa.ru/favicon.ico"
@@ -10,9 +8,6 @@
   />
   Payment Service
 </h1>
-
-
----
 
 ## Architecture
 
