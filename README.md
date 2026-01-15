@@ -40,7 +40,6 @@ location / {
     proxy_buffering off;
 }
 ```
----
 
 #### The key directive:
 
