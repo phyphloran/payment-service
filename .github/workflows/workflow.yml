@@ -8,37 +8,30 @@ on:
 
 jobs:
 
-  test:
-    runs-on: self-hosted
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run tests inside Docker
-        run: |
-          mkdir -p ${{ github.workspace }}/.m2
-          docker run --rm \
-            -u $(id -u):$(id -g) \
-            -v ${{ github.workspace }}:/app \
-            -v ${{ github.workspace }}/.m2:/app/.m2 \
-            -w /app \
-            -e SHOP_ID="${{ secrets.SHOP_ID }}" \
-            -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
-            maven:3.9.9-amazoncorretto-21 \
-            mvn clean test -Dmaven.repo.local=/app/.m2/repository
-  
   build:
-    needs: test
     runs-on: self-hosted
     environment: production
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
+      - name: Build Docker image with Maven dependencies
         run: docker build -t yookassa:latest .
 
-  deploy:
+  test:
     needs: build
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - name: Run tests inside built Docker image
+        run: |
+          docker run --rm \
+            -e SHOP_ID="${{ secrets.SHOP_ID }}" \
+            -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            yookassa:latest \
+            sh -c "mvn test"
+
+  deploy:
+    needs: test
     runs-on: self-hosted
     environment: production
     steps:
@@ -63,5 +56,4 @@ jobs:
         run: docker logs yookassa --tail 50
 
       - name: Remove unused Docker images
-        run: |
-          docker image prune -f
+        run: docker image prune -f
