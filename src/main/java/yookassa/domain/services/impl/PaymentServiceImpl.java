@@ -67,6 +67,14 @@ public class PaymentServiceImpl implements PaymentService {
     ) {
         String ip = httpServletRequest.getRemoteAddr();
         log.info("recived new yookassaWebhookEvent: {}, from ip: {}", yookassaWebhookEventDto.toString(), ip);
+
+        log.info("=== HEADERS ===");
+        httpServletRequest.getHeaderNames().asIterator()
+                .forEachRemaining(name ->
+                        log.info("{}: {}", name, httpServletRequest.getHeader(name))
+                );
+        log.info("=== END HEADERS ===");
+
         if (!ipValidator.isValid(ip)) {
             log.error("An attempt to send a webhook not from an Yookassa IP address: {}", ip);
             throw new IncorrectIpException("Incorrect ip");
