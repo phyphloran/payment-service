@@ -7,23 +7,14 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    runs-on: self-hosted
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build Docker image
-        run: docker build -t yookassa:latest .
 
   test:
-    needs: build
     runs-on: self-hosted
     environment: production
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run tests inside Docker
+      - name: Run tests on source code
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
@@ -33,8 +24,19 @@ jobs:
             maven:3.9.9-amazoncorretto-21 \
             mvn test
 
-  deploy:
+  build:
     needs: test
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build --build-arg MAVEN_REPO_CACHE=$HOME/.m2/repository -t yookassa:latest .
+
+  deploy:
+    needs: build
     runs-on: self-hosted
     environment: production
     steps:
@@ -59,5 +61,4 @@ jobs:
         run: docker logs yookassa --tail 50
 
       - name: Remove unused Docker images
-        run: |
-          docker image prune -f
+        run: docker image prune -f
