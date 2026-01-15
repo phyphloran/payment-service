@@ -16,9 +16,11 @@ jobs:
 
       - name: Run tests inside Docker
         run: |
+          mkdir -p ${{ github.workspace }}/.m2
           docker run --rm \
             -u $(id -u):$(id -g) \
             -v ${{ github.workspace }}:/app \
+            -v ${{ github.workspace }}/.m2:/root/.m2 \
             -w /app \
             -e SHOP_ID="${{ secrets.SHOP_ID }}" \
             -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
