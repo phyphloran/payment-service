@@ -11,6 +11,7 @@ public record ObjectDto(
 
         AmountDto amount,
 
+        @JsonProperty("income_amount")
         AmountDto incomeAmount,
 
         String description,
@@ -19,6 +20,7 @@ public record ObjectDto(
 
         boolean refundable,
 
+        @JsonProperty("refunded_amount")
         AmountDto refundedAmount,
 
         boolean test,
