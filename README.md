@@ -1,29 +1,7 @@
-# ![YooKassa](https://yookassa.ru/favicon.ico) Payment Service
+# ![YooKassa](https://yookassa.ru/favicon.ico)  Payment Service
 
 ## Architecture
 
-🌐 Client (YooKassa)
-       │
-       │  POST /webhook
-       │ 
-       ▼
-   ┌─────────────────────────┐
-   │        Nginx Proxy      │
-   │─────────────────────────│
-   │ 🔑 proxy_set_header    │
-   │   X-Real-IP $remote_addr│
-   └─────────────────────────┘
-       │
-       │  Forwarded POST /webhook
-       │  X-Real-IP: $remote_addr
-       ▼
-┌──────────────────────────────┐
-│      Spring Boot App         │
-│                              |
-│ ✅ Reads X-Real-IP           |
-│ ✅ Validates IP (YooKassa)   │
-│ ✅ Processes webhook         │
-└──────────────────────────────┘
 
 
 
