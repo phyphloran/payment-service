@@ -62,4 +62,12 @@ Important: direct access to the backend from outside must be blocked to prevent 
 
 ---
 
+## 🔄 CI/CD Pipeline with GitHub Actions
+The project includes an automated CI/CD pipeline that tests, builds and deploys the service using GitHub Actions and Docker.
+
+### Pipeline Stages:
+1. Tests Stage
+2. Build Stage
+3. Deploy Stage
+
 [![workflow](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml/badge.svg)](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml)
