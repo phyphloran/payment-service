@@ -21,6 +21,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDto(List.of(exception.getMessage())));
     }
 
+    @ExceptionHandler(IncorrectIpException.class)
+    public ResponseEntity<ErrorDto> incorrectIpException(IncorrectIpException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(List.of(exception.getMessage())));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDto> handleValidationException(MethodArgumentNotValidException exception) {
         List<String> errorMessages = exception.getBindingResult()

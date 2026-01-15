@@ -1,6 +1,7 @@
 package yookassa.domain.services.impl;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,9 @@ import yookassa.api.dtos.client.CreatePaymentResponseDto;
 import yookassa.api.dtos.yookassa.AmountDto;
 import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
 import yookassa.api.dtos.yookassa.requests.ConfirmationRequestDto;
+import yookassa.api.exceptionHandler.IncorrectIpException;
 import yookassa.api.exceptionHandler.PaymentProcessingException;
+import yookassa.domain.services.IpValidator;
 import yookassa.external.PaymentHttpClient;
 import yookassa.api.dtos.yookassa.responses.YooKassaCreatePaymentResponseDto;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
@@ -27,6 +30,8 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentHttpClient paymentHttpClient;
+
+    private final IpValidator ipValidator;
 
     @Value("${yookassa.type}")
     private String type;
@@ -54,9 +59,18 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
+    //TODO
     @Override
-    public void changePaymentStatus(YookassaWebhookEventDto yookassaWebhookEventDto) {
-        //TODO
+    public void processPayment(
+            YookassaWebhookEventDto yookassaWebhookEventDto,
+            HttpServletRequest httpServletRequest
+    ) {
+        String ip = httpServletRequest.getRemoteAddr();
+        log.info("recived new yookassaWebhookEvent: {}, from ip: {}", yookassaWebhookEventDto.toString(), ip);
+        if (!ipValidator.isValid(ip)) {
+            log.error("An attempt to send a webhook not from an Yookassa IP address: {}", ip);
+            throw new IncorrectIpException("Incorrect ip");
+        }
     }
 
     private YooKassaCreatePaymentRequestDto createRequestToYooKassa(CreatePaymentRequestDto createPaymentRequest) {
