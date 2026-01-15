@@ -1,14 +1,15 @@
 package yookassa.api.dtos.client;
 
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 
 public record CreatePaymentRequestDto(
+
+        @Min(value = 0, message = "The user's ID must be positive")
+        @NotNull(message = "UserId can not be null")
+        Long userId,
 
         @NotNull(message = "Amount can not be null")
         @Digits(integer = 10, fraction = 2, message = "Incorrect format of amount")
