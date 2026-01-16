@@ -63,11 +63,19 @@ Important: direct access to the backend from outside must be blocked to prevent 
 ---
 
 ## 🔄 CI/CD Pipeline with GitHub Actions
-The project includes an automated CI/CD pipeline that tests, builds and deploys the service using GitHub Actions and Docker.
+The project includes an automated CI/CD pipeline that tests, builds, and deploys the service using GitHub Actions and Docker.
 
 ### Pipeline Stages:
 1. Tests Stage
+Runs automated tests to ensure code quality and correctness.
+
 2. Build Stage
+Builds a Docker image of the service only if all tests pass successfully.
+
 3. Deploy Stage
+Deploys the built Docker image to the target environment only after a successful build.
+
+### ❗ Pipeline Behavior
+The build and deploy stages are executed only if the tests stage completes successfully. Any test failure stops the pipeline.
 
 [![workflow](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml/badge.svg)](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml)
