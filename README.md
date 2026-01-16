@@ -66,13 +66,13 @@ Important: direct access to the backend from outside must be blocked to prevent 
 The project includes an automated CI/CD pipeline that tests, builds, and deploys the service using GitHub Actions and Docker.
 
 ### Pipeline Stages:
-1. Tests Stage
+1. Tests Stage<br>
 Runs automated tests to ensure code quality and correctness.
 
-2. Build Stage
+2. Build Stage<br>
 Builds a Docker image of the service only if all tests pass successfully.
 
-3. Deploy Stage
+3. Deploy Stage<br>
 Deploys the built Docker image to the target environment only after a successful build.
 
 ### ❗ Pipeline Behavior
