@@ -1,13 +1,11 @@
 package yookassa.domain.services.impl;
 
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import yookassa.domain.services.IpValidator;
 import java.math.BigInteger;
 import java.net.InetAddress;
-import java.util.Arrays;
 
 
 @Service
@@ -64,10 +62,10 @@ public class IpValidatorImpl implements IpValidator {
         return ipVal.and(mask).equals(netVal.and(mask));
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         Arrays.stream(ALLOWED_IPS).forEach(s -> System.out.println(s));
         System.out.println("\n" + ALLOWED_IPS[3]);
-    }
+    }*/
 
 }
