@@ -7,9 +7,8 @@ import java.math.BigDecimal;
 
 public record CreatePaymentRequestDto(
 
-        @Min(value = 0, message = "The user's ID must be positive")
         @NotNull(message = "UserId can not be null")
-        @Digits(integer = 15, fraction = 0, message = "User ID must be an Long")
+        @Min(value = 0, message = "The user's ID must be positive")
         Long userId,
 
         @NotNull(message = "Amount can not be null")
