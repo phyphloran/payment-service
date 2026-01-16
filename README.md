@@ -57,7 +57,7 @@ proxy_set_header X-Real-IP $remote_addr;
 #### What does it give?
 
 Thanks to this directive, Nginx forwards the real client IP to the backend.
-The backend accepts webhooks only from YooKassa, since all traffic goes through Nginx.
+The backend accepts webhooks only from YooKassa, since all traffic goes through Nginx.<br>
 Important: direct access to the backend from outside must be blocked to prevent bypassing the IP check.
 
 ---
