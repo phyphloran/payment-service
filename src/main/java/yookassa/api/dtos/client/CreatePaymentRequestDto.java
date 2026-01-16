@@ -9,10 +9,12 @@ public record CreatePaymentRequestDto(
 
         @Min(value = 0, message = "The user's ID must be positive")
         @NotNull(message = "UserId can not be null")
+        @Digits(integer = 15, fraction = 0, message = "User ID must be an Long")
         Long userId,
 
         @NotNull(message = "Amount can not be null")
-        @Digits(integer = 10, fraction = 2, message = "Incorrect format of amount")
+        @Digits(integer = 15, fraction = 2, message = "Incorrect format of amount")
+        @DecimalMin(value = "0.01", inclusive = true, message = "Amount must be at least 0.01")
         BigDecimal amount,
 
         @NotBlank(message = "Currency can not be empty")
