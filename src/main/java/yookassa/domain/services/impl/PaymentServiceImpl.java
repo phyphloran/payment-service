@@ -3,17 +3,15 @@ package yookassa.domain.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import yookassa.api.dtos.client.CreatePaymentResponseDto;
-import yookassa.api.dtos.yookassa.AmountDto;
 import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
-import yookassa.api.dtos.yookassa.requests.ConfirmationRequestDto;
 import yookassa.api.exceptionHandler.IncorrectIpException;
 import yookassa.api.exceptionHandler.PaymentProcessingException;
+import yookassa.domain.mappers.RequestMapper;
 import yookassa.domain.services.IpValidator;
 import yookassa.external.PaymentHttpClient;
 import yookassa.api.dtos.yookassa.responses.YooKassaCreatePaymentResponseDto;
@@ -28,19 +26,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentHttpClient paymentHttpClient;
-
     private final IpValidator ipValidator;
 
-    @Value("${yookassa.type}")
-    private String type;
+    private final RequestMapper requestMapper;
 
-    @Value("${yookassa.return-url}")
-    private String returnUrl;
+    private final PaymentHttpClient paymentHttpClient;
 
     @Override
     public CreatePaymentResponseDto createPayment(CreatePaymentRequestDto createPaymentRequest) {
-        YooKassaCreatePaymentRequestDto requestToYooKassa = createRequestToYooKassa(createPaymentRequest);
+        YooKassaCreatePaymentRequestDto requestToYooKassa = requestMapper
+                .toYooKassaCreatePaymentRequestDto(createPaymentRequest);
         String idempotenceKey = UUID.randomUUID().toString();
         try {
             YooKassaCreatePaymentResponseDto response =
@@ -65,29 +60,6 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IncorrectIpException("Incorrect ip");
         }
         log.info("recived new yookassaWebhookEvent: {}, from ip: {}", yookassaWebhookEventDto.toString(), ip);
-    }
-
-    private YooKassaCreatePaymentRequestDto createRequestToYooKassa(CreatePaymentRequestDto createPaymentRequest) {
-        return YooKassaCreatePaymentRequestDto.builder()
-                .amount(createAmountDto(createPaymentRequest))
-                .description(createPaymentRequest.description())
-                .capture(true)
-                .confirmation(createConfirmationDto())
-                .build();
-    }
-
-    private AmountDto createAmountDto(CreatePaymentRequestDto createPaymentRequest) {
-        return AmountDto.builder()
-                .value(String.valueOf(createPaymentRequest.amount()))
-                .currency(createPaymentRequest.currency())
-                .build();
-    }
-
-    private ConfirmationRequestDto createConfirmationDto() {
-        return ConfirmationRequestDto.builder()
-                .type(type)
-                .return_url(returnUrl)
-                .build();
     }
 
 }
