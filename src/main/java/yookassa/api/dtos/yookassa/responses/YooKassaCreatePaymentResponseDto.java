@@ -3,7 +3,6 @@ package yookassa.api.dtos.yookassa.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import yookassa.api.dtos.yookassa.AmountDto;
-
 import java.time.Instant;
 
 
