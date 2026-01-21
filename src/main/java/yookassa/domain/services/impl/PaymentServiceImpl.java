@@ -116,7 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
     private void handlePaymentNotification(YookassaWebhookEventDto yookassaWebhookEventDto) {
         if (!"notification".equals(yookassaWebhookEventDto.type())) {
             log.error("Event type not notification {}", yookassaWebhookEventDto);
-            throw new InvalidWebhookException();
+            throw new InvalidWebhookException("Unsupported type of notification");
         }
     }
 
@@ -126,9 +126,10 @@ public class PaymentServiceImpl implements PaymentService {
                 "canceled".equals(yookassaWebhookEventDto.object().status())
         ) {
             existing.setPaymentStatus(PaymentStatus.PAYMENT_CANCELLED);
+            paymentRepository.save(existing);
         } else {
             log.error("changeStatus exception. Payment: {}", existing);
-            throw new InvalidWebhookException();
+            throw new InvalidWebhookException("Incorrect status of payment with id: " + existing.getId());
         }
     }
 
@@ -140,9 +141,10 @@ public class PaymentServiceImpl implements PaymentService {
                 "succeeded".equals(yookassaWebhookEventDto.object().status())
         ) {
             existing.setPaymentStatus(PaymentStatus.PAYMENT_SUCCEEDED);
+            paymentRepository.save(existing);
         } else {
             log.error("changeStatus exception. Payment: {}", existing);
-            throw new InvalidWebhookException();
+            throw new InvalidWebhookException("Incorrect status of payment with id: " + existing.getId());
         }
     }
 

@@ -1,8 +1,12 @@
 package yookassa.api.dtos.yookassa.notifications;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import yookassa.api.dtos.yookassa.AmountDto;
 
+
+@Builder
 public record ObjectDto(
 
         String id,

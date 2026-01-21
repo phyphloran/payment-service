@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
+import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
 import yookassa.api.exceptionHandler.IdempotenceKeyConflictException;
+import yookassa.api.exceptionHandler.InvalidWebhookException;
 import yookassa.api.exceptionHandler.PaymentAlreadyExists;
 import yookassa.domain.entities.PaymentEntity;
 import yookassa.domain.mappers.RequestMapper;
@@ -96,6 +98,44 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void processPayment() {
+    void processPayment_shouldThrowInvalidWebhookTypeException() {
+        PaymentEntity existing = PaymentServiceImplTestData.webhookSucceededPayment(23L, "2500.01");
+        YookassaWebhookEventDto webhookEvent =
+                PaymentServiceImplTestData.webhookEvent(
+                        "test",
+                        "payment.succeeded",
+                        "woiefjhUHUI-8789GHI-kU",
+                        "succeeded",
+                        "2500.01"
+                );
+        when(paymentRepository.findByYookassaPaymentId(webhookEvent.object().id()))
+                .thenReturn(Optional.of(existing));
+        when(ipValidator.isValid(any(String.class)))
+                .thenReturn(true);
+        InvalidWebhookException exception = assertThrows(
+                InvalidWebhookException.class,
+                () -> paymentService.processPayment("mock", webhookEvent)
+        );
+        assertEquals("Unsupported type of notification", exception.getMessage());
+        verify(paymentRepository, never()).save(any());
+        verify(ipValidator, times(1)).isValid(any());
+    }
+
+    @Test
+    void processPayment_shouldThrowInvalidWebhookException() {
+        PaymentEntity existing = PaymentServiceImplTestData.webhookSucceededPayment(23L, "2500.01");
+        YookassaWebhookEventDto webhookEvent =
+                PaymentServiceImplTestData.succeededWebhook("woiefjhUHUI-8789GHI-kU", "2500.01");
+        when(paymentRepository.findByYookassaPaymentId(webhookEvent.object().id()))
+                .thenReturn(Optional.of(existing));
+        when(ipValidator.isValid(any(String.class)))
+                .thenReturn(true);
+        InvalidWebhookException exception = assertThrows(
+                InvalidWebhookException.class,
+                () -> paymentService.processPayment("mock", webhookEvent)
+        );
+        assertEquals("Incorrect status of payment with id: " + existing.getId(), exception.getMessage());
+        verify(paymentRepository, never()).save(any());
+        verify(ipValidator, times(1)).isValid(any());
     }
 }
