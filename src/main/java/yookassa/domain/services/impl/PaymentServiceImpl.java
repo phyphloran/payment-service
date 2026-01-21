@@ -4,7 +4,6 @@ package yookassa.domain.services.impl;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
-
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -85,18 +84,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private CreatePaymentResponseDto handleExistingPayment(PaymentEntity existing) {
-        switch (existing.getPaymentStatus()) {
-            case PAYMENT_PENDING:
-                return new CreatePaymentResponseDto(existing.getPaymentUrl());
-            case PAYMENT_SUCCEEDED:
-                throw new PaymentAlreadyExists("The payment already succeeded");
-            case PAYMENT_CANCELLED:
-                throw new PaymentAlreadyExists("The payment already cancelled");
-            default:
-                throw new IllegalStateException(
-                        "Unsupported payment status: " + existing.getPaymentStatus()
-                );
-        }
+        return switch (existing.getPaymentStatus()) {
+            case PAYMENT_PENDING -> new CreatePaymentResponseDto(existing.getPaymentUrl());
+            case PAYMENT_SUCCEEDED -> throw new PaymentAlreadyExists("The payment already succeeded");
+            case PAYMENT_CANCELLED -> throw new PaymentAlreadyExists("The payment already cancelled");
+            default -> throw new IllegalStateException(
+                    "Unsupported payment status: " + existing.getPaymentStatus()
+            );
+        };
     }
 
     private PaymentEntity findByPaymentId(String paymentId) {
@@ -105,38 +100,49 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void changeStatus(PaymentEntity existing, YookassaWebhookEventDto yookassaWebhookEventDto) {
+        handlePaymentNotification(yookassaWebhookEventDto);
+        String yookassaEvent = yookassaWebhookEventDto.event();
+        switch (yookassaEvent) {
+            case "payment.succeeded":
+                handlePaymentSucceeded(existing, yookassaWebhookEventDto);
+                break;
+            case "payment.canceled":
+                handlePaymentCanceled(existing, yookassaWebhookEventDto);
+                break;
+            default: throw new InvalidWebhookException();
+        }
+    }
+
+    private void handlePaymentNotification(YookassaWebhookEventDto yookassaWebhookEventDto) {
         if (!"notification".equals(yookassaWebhookEventDto.type())) {
             log.error("Event type not notification {}", yookassaWebhookEventDto);
             throw new InvalidWebhookException();
         }
-        BigDecimal webhookAmount = new BigDecimal(yookassaWebhookEventDto.object().amount().value());
-        String yookassaEvent = yookassaWebhookEventDto.event();
+    }
 
-        switch (yookassaEvent) {
-            case "payment.succeeded":
-                if (
-                        webhookAmount.equals(existing.getAmount()) &&
-                        PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
-                        "succeeded".equals(yookassaWebhookEventDto.object().status())
-                ) {
-                    existing.setPaymentStatus(PaymentStatus.PAYMENT_SUCCEEDED);
-                } else {
-                    log.error("changeStatus exception. Payment: {}", existing);
-                    throw new InvalidWebhookException();
-                }
-                break;
-            case "payment.canceled":
-                if (
-                        PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
-                        "canceled".equals(yookassaWebhookEventDto.object().status())
-                ) {
-                    existing.setPaymentStatus(PaymentStatus.PAYMENT_CANCELLED);
-                } else {
-                    log.error("changeStatus exception. Payment: {}", existing);
-                    throw new InvalidWebhookException();
-                }
-                break;
-            default: return;
+    private void handlePaymentCanceled(PaymentEntity existing, YookassaWebhookEventDto yookassaWebhookEventDto) {
+        if (
+                PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
+                "canceled".equals(yookassaWebhookEventDto.object().status())
+        ) {
+            existing.setPaymentStatus(PaymentStatus.PAYMENT_CANCELLED);
+        } else {
+            log.error("changeStatus exception. Payment: {}", existing);
+            throw new InvalidWebhookException();
+        }
+    }
+
+    private void handlePaymentSucceeded(PaymentEntity existing, YookassaWebhookEventDto yookassaWebhookEventDto) {
+        BigDecimal webhookAmount = new BigDecimal(yookassaWebhookEventDto.object().amount().value());
+        if (
+                webhookAmount.equals(existing.getAmount()) &&
+                PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
+                "succeeded".equals(yookassaWebhookEventDto.object().status())
+        ) {
+            existing.setPaymentStatus(PaymentStatus.PAYMENT_SUCCEEDED);
+        } else {
+            log.error("changeStatus exception. Payment: {}", existing);
+            throw new InvalidWebhookException();
         }
     }
 
