@@ -6,6 +6,8 @@ public enum PaymentStatus {
 
     PAYMENT_SUCCEEDED,
 
+    PAYMENT_CANCELLED,
+
     PAYMENT_FAILED,
 
     PAYMENT_REFUNDED

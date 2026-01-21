@@ -4,6 +4,40 @@ server:
 spring:
   application:
     name: yookassa
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  datasource:
+    url: jdbc:postgresql://${DB_IP}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    # HikariCP connection pool settings for high concurrency
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: true
+      pool-name: PaymentServiceHikariPool
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        # Batch inserts for better performance
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        # Connection release mode
+        connection:
+          provider_disables_autocommit: false
+        # Query optimization
+        format_sql: false
+        use_sql_comments: false
 
 yookassa:
   base-url: https://api.yookassa.ru

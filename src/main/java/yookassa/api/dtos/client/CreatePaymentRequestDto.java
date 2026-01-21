@@ -3,6 +3,7 @@ package yookassa.api.dtos.client;
 
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 public record CreatePaymentRequestDto(
@@ -10,6 +11,9 @@ public record CreatePaymentRequestDto(
         @NotNull(message = "UserId can not be null")
         @Min(value = 0, message = "The user's ID must be positive")
         Long userId,
+
+        @NotNull(message = "Idempotence key can not be null")
+        UUID idempotenceKey,
 
         @NotNull(message = "Amount can not be null")
         @Digits(integer = 15, fraction = 2, message = "Incorrect format of amount")
