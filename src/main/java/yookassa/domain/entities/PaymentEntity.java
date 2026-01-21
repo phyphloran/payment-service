@@ -16,7 +16,10 @@ import java.util.UUID;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "payments")
+@Table(name = "payments", indexes = {
+        @Index(name = "idx_payments_idempotence_key", columnList = "idempotence_key"),
+        @Index(name = "idx_payments_user_id", columnList = "user_id")
+})
 public class PaymentEntity {
 
     @Id

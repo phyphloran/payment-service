@@ -9,12 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import yookassa.api.dtos.client.CreatePaymentResponseDto;
 import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
+import yookassa.api.exceptionHandler.IdempotenceKeyConflictException;
 import yookassa.api.exceptionHandler.IncorrectIpException;
+import yookassa.api.exceptionHandler.PaymentAlreadyExists;
 import yookassa.domain.entities.PaymentEntity;
 import yookassa.domain.factories.PaymentFactory;
 import yookassa.domain.mappers.RequestMapper;
 import yookassa.domain.repositories.PaymentRepository;
 import yookassa.domain.services.IpValidator;
+import yookassa.domain.services.PaymentPersistenceService;
 import yookassa.external.PaymentHttpClient;
 import yookassa.api.dtos.yookassa.responses.YooKassaCreatePaymentResponseDto;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
@@ -35,19 +38,20 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
 
+    private final PaymentPersistenceService paymentPersistenceService;
+
     @Override
-    @Transactional
     public CreatePaymentResponseDto createPayment(CreatePaymentRequestDto createPaymentRequest) {
         PaymentEntity existing = findByIdempotenceKey(createPaymentRequest);
         if (existing != null) {
-            return new CreatePaymentResponseDto(existing.getPaymentUrl());
+            return handleExistingPayment(existing);
         }
         YooKassaCreatePaymentRequestDto requestToYooKassa = requestMapper
                 .toYooKassaCreatePaymentRequestDto(createPaymentRequest);
         String idempotenceKey = String.valueOf(createPaymentRequest.idempotenceKey());
         YooKassaCreatePaymentResponseDto response = paymentHttpClient.createPayment(idempotenceKey, requestToYooKassa);
         PaymentEntity paymentEntity = PaymentFactory.buildPaymentEntity(createPaymentRequest, response);
-        return new CreatePaymentResponseDto(paymentRepository.save(paymentEntity).getPaymentUrl());
+        return paymentPersistenceService.save(paymentEntity);
     }
 
     @Override
@@ -66,11 +70,26 @@ public class PaymentServiceImpl implements PaymentService {
         if (existing.isPresent()) {
             PaymentEntity paymentEntity = existing.get();
             if (!paymentEntity.getUserId().equals(createPaymentRequest.userId())) {
-                throw new RuntimeException("Idempotence key already used by another user");
+                throw new IdempotenceKeyConflictException("Idempotence key already used by another user");
             }
             return paymentEntity;
         }
         return null;
+    }
+
+    private CreatePaymentResponseDto handleExistingPayment(PaymentEntity existing) {
+        switch (existing.getPaymentStatus()) {
+            case PAYMENT_PENDING:
+                return new CreatePaymentResponseDto(existing.getPaymentUrl());
+            case PAYMENT_SUCCEEDED:
+                throw new PaymentAlreadyExists("The payment already succeeded");
+            case PAYMENT_CANCELLED:
+                throw new PaymentAlreadyExists("The payment already cancelled");
+            default:
+                throw new IllegalStateException(
+                        "Unsupported payment status: " + existing.getPaymentStatus()
+                );
+        }
     }
 
 }

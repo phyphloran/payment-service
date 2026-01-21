@@ -79,4 +79,9 @@ public class GlobalExceptionHandler {
                 .body(new ErrorDto(List.of("Unexpected error, please try again later")));
     }
 
+    @ExceptionHandler(PaymentAlreadyExists.class)
+    public ResponseEntity<ErrorDto> paymentAlreadyExists(PaymentAlreadyExists exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(List.of(exception.getMessage())));
+    }
+
 }
