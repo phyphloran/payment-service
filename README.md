@@ -9,6 +9,19 @@
   Payment Service
 </h1>
 
+## ⚙️ Technologies
+
+- `Java 21`
+- `Spring Boot 3+`
+- `Spring-boot-starter-validation`
+- `Spring Data JPA`
+- `PostgreSQL`
+- `Docker`
+- `JUnit 5`
+- `Mockito`
+- `GitHub Actions (CI/CD for testing, build and deploy)`
+- `Nginx (reverse proxy, SSL termination)`
+
 ## Architecture
 
 <table>
