@@ -22,10 +22,33 @@
       </ol>
     </td>
     <td>
-      <img src="https://github.com/phyphloran/payment-service/blob/main/architecture.png" alt="Architecture" width="500"/>
+      <img 
+        src="https://github.com/phyphloran/payment-service/blob/main/architecture_pics/webhook_event.JPEG" 
+        alt="Webhook Event Flow" 
+        width="500"
+      />
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      <strong>Payment Creation Flow</strong>
+      <ol>
+        <li>Client sends POST /payments</li>
+        <li>Spring Boot creates payment request</li>
+        <li>YooKassa returns payment confirmation</li>
+      </ol>
+    </td>
+    <td>
+      <img 
+        src="https://github.com/phyphloran/payment-service/blob/main/architecture_pics/create_payment.JPEG" 
+        alt="Create Payment Flow" 
+        width="500"
+      />
     </td>
   </tr>
 </table>
+
 
 ---
 
