@@ -44,7 +44,7 @@ The service implements the full payment lifecycle and provides the following fea
 - `GitHub Actions (CI/CD for testing, build and deploy)`
 - `Nginx (reverse proxy, SSL termination)`
 
-## Architecture
+## 🏗️ Architecture
 
 <table>
   <tr>
