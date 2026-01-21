@@ -27,7 +27,7 @@ jobs:
             -e DB_IP="${{ secrets.DB_IP }}" \
             -e DB_NAME="${{ secrets.DB_NAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-            -e DB_PORT="${{ secrets.DB_PORT }}" \ 
+            -e DB_PORT="${{ secrets.DB_PORT }}" \
             -e DB_USER="${{ secrets.DB_USER }}" \
             maven:3.9.9-amazoncorretto-21 \
             mvn clean test -Dmaven.repo.local=/app/.m2/repository
@@ -62,9 +62,9 @@ jobs:
             -e SHOP_ID="${{ secrets.SHOP_ID }}" \
             -e SECRET_KEY="${{ secrets.SECRET_KEY }}" \
             -e DB_IP="${{ secrets.DB_IP }}" \
-            -e DB_NAME="${{ secrets.DB_NAME }}" \ 
+            -e DB_NAME="${{ secrets.DB_NAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-            -e DB_PORT="${{ secrets.DB_PORT }}" \ 
+            -e DB_PORT="${{ secrets.DB_PORT }}" \
             -e DB_USER="${{ secrets.DB_USER }}" \
             -p 127.0.0.1:8080:8080 \
             yookassa:latest
