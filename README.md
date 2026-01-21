@@ -9,6 +9,28 @@
   Payment Service
 </h1>
 
+A Spring Boot service for integration with the **YooKassa** payment system, designed for secure creation and processing of online payments.
+
+The service implements the full payment lifecycle and provides the following features:
+
+## Features
+
+- **Idempotent payment creation**  
+  Ensures that repeated requests with the same idempotence key do not result in duplicate payments.
+
+- **Payment status persistence and management**  
+  Payments are stored in the database and transition through the following states:  
+  `PENDING`, `SUCCEEDED`, `CANCELLED`.
+
+- **YooKassa webhook processing**  
+  Supports `payment.succeeded` and `payment.canceled` events with validation of event data and payment consistency.
+
+- **YooKassa IP address validation**  
+  Webhook notifications are accepted only from trusted YooKassa IP addresses, protecting the service from request spoofing.
+
+- **Protection against duplicate and invalid notifications**  
+  The service validates event type, payment status, and amount to prevent repeated processing and inconsistent state updates.
+
 ## ⚙️ Technologies
 
 - `Java 21`
