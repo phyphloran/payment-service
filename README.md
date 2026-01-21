@@ -84,12 +84,7 @@ The service implements the full payment lifecycle and provides the following fea
   </tr>
 </table>
 
-
----
-
 ## Nginx Proxy Configuration
-
----
 
 ```
 location / {
@@ -117,8 +112,6 @@ proxy_set_header X-Real-IP $remote_addr;
 Thanks to this directive, Nginx forwards the real client IP to the backend.
 The backend accepts webhooks only from YooKassa, since all traffic goes through Nginx.<br>
 Important: direct access to the backend from outside must be blocked to prevent bypassing the IP check.
-
----
 
 ## 🔄 CI/CD Pipeline with GitHub Actions
 The project includes an automated CI/CD pipeline that tests, builds, and deploys the service using GitHub Actions and Docker.
