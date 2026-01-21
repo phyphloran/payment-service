@@ -1,6 +1,6 @@
 package yookassa.unit.data;
 
-public class TestData {
+public class IpValidatorTestData {
 
     public static final String[] ALLOWED_IPS = new String[] {
             "185.71.76.0/27",

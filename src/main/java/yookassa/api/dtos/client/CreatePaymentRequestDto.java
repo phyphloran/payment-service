@@ -2,10 +2,12 @@ package yookassa.api.dtos.client;
 
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 
+@Builder
 public record CreatePaymentRequestDto(
 
         @NotNull(message = "UserId can not be null")
