@@ -71,7 +71,7 @@ class PaymentServiceImplTest {
                 PaymentAlreadyExists.class,
                 () -> paymentService.createPayment(request)
         );
-        assertEquals("The payment already cancelledd", exception.getMessage());
+        assertEquals("The payment already cancelled", exception.getMessage());
         verifyNoInteractions(paymentHttpClient);
         verifyNoInteractions(paymentPersistenceService);
     }
