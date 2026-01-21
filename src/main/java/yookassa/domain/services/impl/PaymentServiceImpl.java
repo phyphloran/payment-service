@@ -1,8 +1,11 @@
 package yookassa.domain.services.impl;
 
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +14,10 @@ import yookassa.api.dtos.client.CreatePaymentResponseDto;
 import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
 import yookassa.api.exceptionHandler.IdempotenceKeyConflictException;
 import yookassa.api.exceptionHandler.IncorrectIpException;
+import yookassa.api.exceptionHandler.InvalidWebhookException;
 import yookassa.api.exceptionHandler.PaymentAlreadyExists;
 import yookassa.domain.entities.PaymentEntity;
+import yookassa.domain.entities.PaymentStatus;
 import yookassa.domain.factories.PaymentFactory;
 import yookassa.domain.mappers.RequestMapper;
 import yookassa.domain.repositories.PaymentRepository;
@@ -62,6 +67,8 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IncorrectIpException("Incorrect ip");
         }
         log.info("Recived new yookassaWebhookEvent: {}, from ip: {}", yookassaWebhookEventDto.toString(), ip);
+        PaymentEntity paymentEntity = findByPaymentId(yookassaWebhookEventDto.object().id());
+        changeStatus(paymentEntity, yookassaWebhookEventDto);
     }
 
     private PaymentEntity findByIdempotenceKey(CreatePaymentRequestDto createPaymentRequest) {
@@ -89,6 +96,47 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new IllegalStateException(
                         "Unsupported payment status: " + existing.getPaymentStatus()
                 );
+        }
+    }
+
+    private PaymentEntity findByPaymentId(String paymentId) {
+        return paymentRepository.findByYookassaPaymentId(paymentId)
+                .orElseThrow(() -> new EntityNotFoundException("Payment with paymentId: " + paymentId + " not found"));
+    }
+
+    private void changeStatus(PaymentEntity existing, YookassaWebhookEventDto yookassaWebhookEventDto) {
+        if (!"notification".equals(yookassaWebhookEventDto.type())) {
+            log.error("Event type not notification {}", yookassaWebhookEventDto);
+            throw new InvalidWebhookException();
+        }
+        BigDecimal webhookAmount = new BigDecimal(yookassaWebhookEventDto.object().amount().value());
+        String yookassaEvent = yookassaWebhookEventDto.event();
+
+        switch (yookassaEvent) {
+            case "payment.succeeded":
+                if (
+                        webhookAmount.equals(existing.getAmount()) &&
+                        PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
+                        "succeeded".equals(yookassaWebhookEventDto.object().status())
+                ) {
+                    existing.setPaymentStatus(PaymentStatus.PAYMENT_SUCCEEDED);
+                } else {
+                    log.error("changeStatus exception. Payment: {}", existing);
+                    throw new InvalidWebhookException();
+                }
+                break;
+            case "payment.canceled":
+                if (
+                        PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
+                        "canceled".equals(yookassaWebhookEventDto.object().status())
+                ) {
+                    existing.setPaymentStatus(PaymentStatus.PAYMENT_CANCELLED);
+                } else {
+                    log.error("changeStatus exception. Payment: {}", existing);
+                    throw new InvalidWebhookException();
+                }
+                break;
+            default: return;
         }
     }
 

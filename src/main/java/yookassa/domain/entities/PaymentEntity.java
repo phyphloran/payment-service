@@ -18,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "payments", indexes = {
         @Index(name = "idx_payments_idempotence_key", columnList = "idempotence_key"),
+        @Index(name = "idx_payments_yookassa_payment_id", columnList = "yookassa_payment_id"),
         @Index(name = "idx_payments_user_id", columnList = "user_id")
 })
 public class PaymentEntity {
