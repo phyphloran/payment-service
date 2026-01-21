@@ -13,7 +13,7 @@ A Spring Boot service for integration with the **YooKassa** payment system, desi
 
 The service implements the full payment lifecycle and provides the following features:
 
-## Features
+## ✨ Features
 
 - **Idempotent payment creation**  
   Ensures that repeated requests with the same idempotence key do not result in duplicate payments.
