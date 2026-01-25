@@ -24,7 +24,7 @@ public class PaymentHttpClientConfig {
     private String secretKey;
 
     @Bean
-    RestClient PaymentRestClient(RestClient.Builder builder) {
+    RestClient paymentRestClient(RestClient.Builder builder) {
         String credentials = shopId + ":" + secretKey;
         String authHeader = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
         return builder
