@@ -141,7 +141,7 @@ public class PaymentServiceImpl implements PaymentService {
     private void handlePaymentSucceeded(PaymentEntity existing, YookassaWebhookEventDto yookassaWebhookEventDto) {
         BigDecimal webhookAmount = new BigDecimal(yookassaWebhookEventDto.object().amount().value());
         if (
-                webhookAmount.equals(existing.getAmount()) &&
+                webhookAmount.compareTo(existing.getAmount()) == 0 &&
                 PaymentStatus.PAYMENT_PENDING.equals(existing.getPaymentStatus()) &&
                 "succeeded".equals(yookassaWebhookEventDto.object().status())
         ) {
