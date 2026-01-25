@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,16 +47,20 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public CreatePaymentResponseDto createPayment(CreatePaymentRequestDto createPaymentRequest) {
-        PaymentEntity existing = findByIdempotenceKey(createPaymentRequest);
-        if (existing != null) {
-            return handleExistingPayment(existing);
+        try {
+            PaymentEntity existing = findByIdempotenceKey(createPaymentRequest);
+            if (existing != null) {
+                return handleExistingPayment(existing);
+            }
+            YooKassaCreatePaymentRequestDto requestToYooKassa = requestMapper
+                    .toYooKassaCreatePaymentRequestDto(createPaymentRequest);
+            String idempotenceKey = String.valueOf(createPaymentRequest.idempotenceKey());
+            YooKassaCreatePaymentResponseDto response = paymentHttpClient.createPayment(idempotenceKey, requestToYooKassa);
+            PaymentEntity paymentEntity = PaymentFactory.buildPaymentEntity(createPaymentRequest, response);
+            return paymentPersistenceService.save(paymentEntity);
+        } catch (DataIntegrityViolationException exception) {
+            throw new PaymentAlreadyExists("The payment already exist");
         }
-        YooKassaCreatePaymentRequestDto requestToYooKassa = requestMapper
-                .toYooKassaCreatePaymentRequestDto(createPaymentRequest);
-        String idempotenceKey = String.valueOf(createPaymentRequest.idempotenceKey());
-        YooKassaCreatePaymentResponseDto response = paymentHttpClient.createPayment(idempotenceKey, requestToYooKassa);
-        PaymentEntity paymentEntity = PaymentFactory.buildPaymentEntity(createPaymentRequest, response);
-        return paymentPersistenceService.save(paymentEntity);
     }
 
     @Override
