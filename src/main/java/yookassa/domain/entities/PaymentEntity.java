@@ -58,8 +58,8 @@ public class PaymentEntity {
     @Column(name = "payment_status", length = 25, nullable = false)
     private PaymentStatus paymentStatus;
 
-    @Column(name = "payment_url", length = 1000, nullable = false)
-    private String paymentUrl;
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    PaymentDetailEntity paymentDetail;
 
     @PrePersist
     public void onCreate() {

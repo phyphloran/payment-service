@@ -4,7 +4,9 @@ package yookassa.unit.data;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
 import yookassa.api.dtos.yookassa.AmountDto;
 import yookassa.api.dtos.yookassa.notifications.ObjectDto;
+import yookassa.api.dtos.yookassa.notifications.PaymentMethodDto;
 import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
+import yookassa.domain.entities.PaymentDetailEntity;
 import yookassa.domain.entities.PaymentEntity;
 import yookassa.domain.entities.PaymentStatus;
 import java.math.BigDecimal;
@@ -113,7 +115,37 @@ public class PaymentServiceImplTestData {
         return YookassaWebhookEventDto.builder()
                 .type("notification")
                 .event("payment.succeeded")
-                .object(webhookObject("woiefjhUHUI-8789GHI-kU", "succeeded", amount))
+                .object(webhookObjectBuild(
+                        "woiefjhUHUI-8789GHI-kU",
+                        "succeeded",
+                        amount
+                ))
+                .build();
+    }
+
+    public static ObjectDto webhookObjectBuild(String id, String status, String amount) {
+        return ObjectDto.builder()
+                .id(id)
+                .status(status)
+                .amount(AmountDto.builder()
+                        .value(amount)
+                        .currency("RUB")
+                        .build())
+                .paymentMethod(PaymentMethodDto.builder()
+                        .type("yoo_money")
+                        .title("YooMoney wallet 410011758831136")
+                        .build())
+                .build();
+    }
+
+    public static PaymentEntity webhookPendingPaymentWithLink(Long id, String amount) {
+        return PaymentEntity.builder()
+                .id(id)
+                .paymentStatus(PaymentStatus.PAYMENT_PENDING)
+                .amount(new BigDecimal(amount))
+                .paymentDetail(PaymentDetailEntity.builder()
+                        .paymentUrl("link")
+                        .build())
                 .build();
     }
 

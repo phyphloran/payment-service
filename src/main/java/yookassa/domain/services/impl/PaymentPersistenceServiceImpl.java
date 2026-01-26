@@ -19,7 +19,7 @@ public class PaymentPersistenceServiceImpl implements PaymentPersistenceService 
     @Transactional
     public CreatePaymentResponseDto save(PaymentEntity entity) {
         return new CreatePaymentResponseDto(
-                paymentRepository.save(entity).getPaymentUrl()
+                paymentRepository.save(entity).getPaymentDetail().getPaymentUrl()
         );
     }
 

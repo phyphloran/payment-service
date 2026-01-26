@@ -168,7 +168,7 @@ class PaymentServiceImplTest {
 
     @Test
     void processPayment_shouldSucceed_whenPaymentIsPendingAndAmountsMatch() {
-        PaymentEntity existing = PaymentServiceImplTestData.webhookPendingPayment(23L, "1212.2000");
+        PaymentEntity existing = PaymentServiceImplTestData.webhookPendingPaymentWithLink(23L, "1212.2000");
         YookassaWebhookEventDto webhookEvent =
                 PaymentServiceImplTestData.buildWebhookEvent("1212.2");
 

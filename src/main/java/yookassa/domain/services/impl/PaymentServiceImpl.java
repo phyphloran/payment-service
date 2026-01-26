@@ -90,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private CreatePaymentResponseDto handleExistingPayment(PaymentEntity existing) {
         return switch (existing.getPaymentStatus()) {
-            case PAYMENT_PENDING -> new CreatePaymentResponseDto(existing.getPaymentUrl());
+            case PAYMENT_PENDING -> new CreatePaymentResponseDto(existing.getPaymentDetail().getPaymentUrl());
             case PAYMENT_SUCCEEDED -> throw new PaymentAlreadyExists("The payment already succeeded");
             case PAYMENT_CANCELLED -> throw new PaymentAlreadyExists("The payment already cancelled");
             default -> throw new IllegalStateException(
@@ -131,6 +131,7 @@ public class PaymentServiceImpl implements PaymentService {
                 "canceled".equals(yookassaWebhookEventDto.object().status())
         ) {
             existing.setPaymentStatus(PaymentStatus.PAYMENT_CANCELLED);
+            existing.setPaymentDetail(null);
             paymentRepository.save(existing);
         } else {
             log.error("changeStatus exception. Payment: {}", existing);
@@ -146,6 +147,9 @@ public class PaymentServiceImpl implements PaymentService {
                 "succeeded".equals(yookassaWebhookEventDto.object().status())
         ) {
             existing.setPaymentStatus(PaymentStatus.PAYMENT_SUCCEEDED);
+            existing.getPaymentDetail().setPaymentUrl(null);
+            existing.getPaymentDetail().setPaymentMethod(yookassaWebhookEventDto.object().paymentMethod().type());
+            existing.getPaymentDetail().setPaymentMethodDetail(yookassaWebhookEventDto.object().paymentMethod().title());
             paymentRepository.save(existing);
         } else {
             log.error("changeStatus exception. Payment: {}", existing);
