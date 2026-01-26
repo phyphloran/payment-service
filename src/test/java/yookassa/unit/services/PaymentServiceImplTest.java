@@ -19,8 +19,8 @@ import yookassa.domain.services.impl.PaymentServiceImpl;
 import yookassa.external.PaymentHttpClient;
 import yookassa.unit.data.PaymentServiceImplTestData;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -136,6 +136,52 @@ class PaymentServiceImplTest {
         );
         assertEquals("Incorrect status of payment with id: " + existing.getId(), exception.getMessage());
         verify(paymentRepository, never()).save(any());
+        verify(ipValidator, times(1)).isValid(any());
+    }
+
+    // compareTo logic tests
+    @Test
+    void processPayment_shouldThrowException_whenAmountDoesNotMatch() {
+        PaymentEntity existing = PaymentServiceImplTestData.webhookPendingPayment(23L, "2500.55");
+        YookassaWebhookEventDto webhookEvent =
+                PaymentServiceImplTestData.webhookEvent(
+                        "notification",
+                        "payment.succeeded",
+                        "woiefjhUHUI-8789GHI-kU",
+                        "succeeded",
+                        "3425345.1"
+                );
+
+        when(paymentRepository.findByYookassaPaymentId(webhookEvent.object().id()))
+                .thenReturn(Optional.of(existing));
+        when(ipValidator.isValid(any(String.class)))
+                .thenReturn(true);
+
+        InvalidWebhookException exception = assertThrows(
+                InvalidWebhookException.class,
+                () -> paymentService.processPayment("mock", webhookEvent)
+        );
+        assertEquals("Incorrect status of payment with id: " + existing.getId(), exception.getMessage());
+        verify(paymentRepository, never()).save(any());
+        verify(ipValidator, times(1)).isValid(any());
+    }
+
+    @Test
+    void processPayment_shouldSucceed_whenPaymentIsPendingAndAmountsMatch() {
+        PaymentEntity existing = PaymentServiceImplTestData.webhookPendingPayment(23L, "1212.2000");
+        YookassaWebhookEventDto webhookEvent =
+                PaymentServiceImplTestData.buildWebhookEvent("1212.2");
+
+        when(paymentRepository.findByYookassaPaymentId(webhookEvent.object().id()))
+                .thenReturn(Optional.of(existing));
+        when(ipValidator.isValid(any(String.class)))
+                .thenReturn(true);
+
+        assertDoesNotThrow(() -> {
+            paymentService.processPayment("mock", webhookEvent);
+        });
+
+        verify(paymentRepository, times(1)).save(any());
         verify(ipValidator, times(1)).isValid(any());
     }
 }

@@ -87,6 +87,14 @@ public class PaymentServiceImplTestData {
                 .build();
     }
 
+    public static PaymentEntity webhookPendingPayment(Long id, String amount) {
+        return PaymentEntity.builder()
+                .id(id)
+                .paymentStatus(PaymentStatus.PAYMENT_PENDING)
+                .amount(new BigDecimal(amount))
+                .build();
+    }
+
 
     public static YookassaWebhookEventDto webhookEvent(String type, String event, String paymentId, String status, String amount) {
         return YookassaWebhookEventDto.builder()
@@ -99,6 +107,14 @@ public class PaymentServiceImplTestData {
     public static YookassaWebhookEventDto succeededWebhook(String paymentId, String amount) {
         ObjectDto objectDto = webhookObject(paymentId, "succeeded", amount);
         return webhookEvent("notification", "payment.succeeded", objectDto);
+    }
+
+    public static YookassaWebhookEventDto buildWebhookEvent(String amount) {
+        return YookassaWebhookEventDto.builder()
+                .type("notification")
+                .event("payment.succeeded")
+                .object(webhookObject("woiefjhUHUI-8789GHI-kU", "succeeded", amount))
+                .build();
     }
 
 }
