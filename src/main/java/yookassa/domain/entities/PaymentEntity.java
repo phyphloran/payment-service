@@ -59,7 +59,7 @@ public class PaymentEntity {
     private PaymentStatus paymentStatus;
 
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    PaymentDetailEntity paymentDetail;
+    private PaymentDetailEntity paymentDetail;
 
     @PrePersist
     public void onCreate() {
