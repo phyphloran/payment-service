@@ -51,9 +51,6 @@ public class PaymentEntity {
     @Column(name = "description", length = 100, nullable = false)
     private String description;
 
-    @Column(name = "refunded_amount", precision = 19, scale = 2, nullable = true)
-    private BigDecimal refundedAmount;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", length = 25, nullable = false)
     private PaymentStatus paymentStatus;

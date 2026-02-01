@@ -2,15 +2,20 @@ package yookassa.domain.services.impl;
 
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import yookassa.api.dtos.client.CreatePaymentResponseDto;
+import yookassa.api.dtos.client.*;
 import yookassa.api.dtos.yookassa.notifications.YookassaWebhookEventDto;
 import yookassa.api.exceptionHandler.IdempotenceKeyConflictException;
 import yookassa.api.exceptionHandler.IncorrectIpException;
@@ -19,13 +24,13 @@ import yookassa.api.exceptionHandler.PaymentAlreadyExists;
 import yookassa.domain.entities.PaymentEntity;
 import yookassa.domain.entities.PaymentStatus;
 import yookassa.domain.factories.PaymentFactory;
+import yookassa.domain.mappers.PaymentMapper;
 import yookassa.domain.mappers.RequestMapper;
 import yookassa.domain.repositories.PaymentRepository;
 import yookassa.domain.services.IpValidator;
 import yookassa.domain.services.PaymentPersistenceService;
 import yookassa.external.PaymentHttpClient;
 import yookassa.api.dtos.yookassa.responses.YooKassaCreatePaymentResponseDto;
-import yookassa.api.dtos.client.CreatePaymentRequestDto;
 import yookassa.api.dtos.yookassa.requests.YooKassaCreatePaymentRequestDto;
 import yookassa.domain.services.PaymentService;
 
@@ -39,11 +44,29 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final RequestMapper requestMapper;
 
+    private final PaymentMapper paymentMapper;
+
     private final PaymentHttpClient paymentHttpClient;
 
     private final PaymentRepository paymentRepository;
 
     private final PaymentPersistenceService paymentPersistenceService;
+
+    @Override
+    public PaymentsPageDto getPaymentsByUserId(Long userId, int page, int size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<PaymentEntity> paymentsPage = paymentRepository.findByUserId(userId, pageRequest);
+
+        List<PaymentResponseDto> paymentResponseDtos = paymentsPage.getContent().stream()
+                .map(paymentEntity -> paymentMapper.toPaymentDto(paymentEntity))
+                .collect(Collectors.toList());
+
+        PageDto pageDto = buildPageDto(paymentsPage);
+
+        return new PaymentsPageDto(paymentResponseDtos, pageDto);
+    }
 
     @Override
     public CreatePaymentResponseDto createPayment(CreatePaymentRequestDto createPaymentRequest) {
@@ -90,7 +113,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private CreatePaymentResponseDto handleExistingPayment(PaymentEntity existing) {
         return switch (existing.getPaymentStatus()) {
-            case PAYMENT_PENDING -> new CreatePaymentResponseDto(existing.getPaymentDetail().getPaymentUrl());
+            case PAYMENT_PENDING -> new CreatePaymentResponseDto(
+                    existing.getPaymentDetail() != null ? existing.getPaymentDetail().getPaymentUrl() : null
+            );
             case PAYMENT_SUCCEEDED -> throw new PaymentAlreadyExists("The payment already succeeded");
             case PAYMENT_CANCELLED -> throw new PaymentAlreadyExists("The payment already cancelled");
             default -> throw new IllegalStateException(
@@ -155,6 +180,10 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("changeStatus exception. Payment: {}", existing);
             throw new InvalidWebhookException("Incorrect status of payment with id: " + existing.getId());
         }
+    }
+
+    private PageDto buildPageDto(Page<?> page) {
+        return new PageDto(page.getNumber(), page.getTotalPages());
     }
 
 }

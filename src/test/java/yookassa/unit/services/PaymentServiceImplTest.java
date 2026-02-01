@@ -11,6 +11,7 @@ import yookassa.api.exceptionHandler.IdempotenceKeyConflictException;
 import yookassa.api.exceptionHandler.InvalidWebhookException;
 import yookassa.api.exceptionHandler.PaymentAlreadyExists;
 import yookassa.domain.entities.PaymentEntity;
+import yookassa.domain.mappers.PaymentMapper;
 import yookassa.domain.mappers.RequestMapper;
 import yookassa.domain.repositories.PaymentRepository;
 import yookassa.domain.services.IpValidator;
@@ -32,6 +33,9 @@ class PaymentServiceImplTest {
 
     @Mock
     private RequestMapper requestMapper;
+
+    @Mock
+    private PaymentMapper paymentMapper;
 
     @Mock
     private PaymentHttpClient paymentHttpClient;

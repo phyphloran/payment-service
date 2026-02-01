@@ -4,6 +4,8 @@ package yookassa.domain.entities;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 
 @Entity
 @Getter
@@ -26,6 +28,9 @@ public class PaymentDetailEntity {
 
     @Column(name = "payment_method_detail", length = 100, nullable = true)
     private String paymentMethodDetail;
+
+    @Column(name = "refunded_amount", precision = 19, scale = 2, nullable = true)
+    private BigDecimal refundedAmount;
 
     @JoinColumn(name = "payment_id", nullable = false)
     @OneToOne(fetch = FetchType.LAZY)

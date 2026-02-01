@@ -84,4 +84,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(List.of(exception.getMessage())));
     }
 
+    @ExceptionHandler(IdempotenceKeyConflictException.class)
+    public ResponseEntity<ErrorDto> idempotenceKeyConflictException(IdempotenceKeyConflictException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(List.of(exception.getMessage())));
+    }
+
 }
