@@ -4,12 +4,9 @@ package yookassa.domain.mappers.Impl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import yookassa.api.dtos.client.CreatePaymentRequestDto;
-import yookassa.api.dtos.client.PaymentResponseDto;
 import yookassa.api.dtos.yookassa.AmountDto;
 import yookassa.api.dtos.yookassa.requests.ConfirmationRequestDto;
 import yookassa.api.dtos.yookassa.requests.YooKassaCreatePaymentRequestDto;
-import yookassa.domain.entities.PaymentDetailEntity;
-import yookassa.domain.entities.PaymentEntity;
 import yookassa.domain.mappers.RequestMapper;
 
 
