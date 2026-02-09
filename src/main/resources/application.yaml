@@ -53,3 +53,13 @@ yookassa:
     77.75.156.35, 
     77.75.154.128/25, 
     2a02:5180::/32
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
