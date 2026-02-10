@@ -129,4 +129,44 @@ Deploys the built Docker image to the target environment only after a successful
 ### ❗ Pipeline Behavior
 The build and deploy stages are executed only if the tests stage completes successfully. Any test failure stops the pipeline.
 
+## 📊 Monitoring & Metrics
+
+The service exposes metrics via **Micrometer** and **Spring Boot Actuator**, collected by **Prometheus** and visualized in **Grafana**.
+
+<table>
+  <tr>
+    <th align="center">Metric</th>
+    <th align="center">Visualization</th>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      <strong>Throughput</strong><br/>
+      Number of HTTP requests processed by the service over time.
+    </td>
+    <td>
+      <img 
+        src="https://github.com/phyphloran/payment-service/blob/main/monitoring/Throughput.png" 
+        alt="Throughput Metrics" 
+        width="500"
+      />
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      <strong>Micrometer Metrics</strong><br/>
+      JVM, HTTP latency, and application-level metrics exported via Micrometer.
+    </td>
+    <td>
+      <img 
+        src="https://github.com/phyphloran/payment-service/blob/main/monitoring/micrometer.png" 
+        alt="Micrometer Metrics" 
+        width="500"
+      />
+    </td>
+  </tr>
+</table>
+
+
 [![workflow](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml/badge.svg)](https://github.com/phyphloran/payment-service/actions/workflows/workflow.yml)
